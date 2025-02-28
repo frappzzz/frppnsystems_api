@@ -19,6 +19,8 @@ async def weather_query(
             weather_data = response.json()
             # Сохранение запроса в базу данных
             try:
+                print(utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"], weather_data["timezone"]))
+                print(type(utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"], weather_data["timezone"])))
                 await conn.execute(
                     """
                     INSERT INTO weather_queries 
@@ -26,19 +28,20 @@ async def weather_query(
                     humidity, pressure, wind_speed, wind_direction, sunrise, sunset, data_calculation, weather_json) 
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
                     """,
-                    id_user, weather_data["name"],
-                               weather_data["weather"][0]['main'],
-                               weather_data["weather"][0]["description"],
-                               weather_data["main"]["temp"],
-                               weather_data["main"]["feels_like"],
-                               weather_data["main"]["humidity"],
-                               utils.hpa_to_mmhg(weather_data["main"]["pressure"]),
-                               weather_data["wind"]["speed"],
-                               utils.wind_direction(weather_data["wind"]["deg"]),
-                               utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"], weather_data["timezone"]),
-                               utils.timestamp_to_hms_format(weather_data["sys"]["sunset"], weather_data["timezone"]),
-                               utils.timestamp_to_hms_format(weather_data["dt"],weather_data["timezone"]),
-                               json.dumps(weather_data)
+                    id_user,
+                    weather_data["name"],
+                    weather_data["weather"][0]['main'],
+                    weather_data["weather"][0]["description"],
+                    weather_data["main"]["temp"],
+                    weather_data["main"]["feels_like"],
+                    weather_data["main"]["humidity"],
+                    utils.hpa_to_mmhg(weather_data["main"]["pressure"]),
+                    weather_data["wind"]["speed"],
+                    utils.wind_direction(weather_data["wind"]["deg"]),
+                    utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"], weather_data["timezone"]),
+                    utils.timestamp_to_hms_format(weather_data["sys"]["sunset"], weather_data["timezone"]),
+                    utils.timestamp_to_hms_format(weather_data["dt"],weather_data["timezone"]),
+                    json.dumps(weather_data)
                 )
                 return {"message": "Weather query saved successfully"}
             except asyncpg.PostgresError as e:
