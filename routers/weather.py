@@ -13,14 +13,36 @@ async def weather_query(
     api_key: str = Depends(get_api_key),
     conn: asyncpg.Connection = Depends(get_db)
 ):
-    print(id_user,city)
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={os.getenv('WEATHER_API_KEY')}&units=metric"
     response = requests.get(url)
     if response.status_code == 200:
             weather_data = response.json()
-            print(weather_data)
             # Сохранение запроса в базу данных
-            return weather_data
+            try:
+                await conn.execute(
+                    """
+                    INSERT INTO weather_queries 
+                    (id_user, city_name, weather_main, weather_description, temperature, temperature_feels_like, 
+                    humidity, pressure, wind_speed, wind_direction, sunrise, sunset, data_calculation, weather_json) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                    """,
+                    id_user, weather_data["name"],
+                               weather_data["weather"][0]['main'],
+                               weather_data["weather"][0]["description"],
+                               weather_data["main"]["temp"],
+                               weather_data["main"]["feels_like"],
+                               weather_data["main"]["humidity"],
+                               utils.hpa_to_mmhg(weather_data["main"]["pressure"]),
+                               weather_data["wind"]["speed"],
+                               utils.wind_direction(weather_data["wind"]["deg"]),
+                               utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"], weather_data["timezone"]),
+                               utils.timestamp_to_hms_format(weather_data["sys"]["sunset"], weather_data["timezone"]),
+                               utils.timestamp_to_hms_format(weather_data["dt"],weather_data["timezone"]),
+                               json.dumps(weather_data)
+                )
+                return {"message": "Weather query saved successfully"}
+            except asyncpg.PostgresError as e:
+                raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 
     else:
