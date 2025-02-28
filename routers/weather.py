@@ -53,7 +53,19 @@ async def weather_query(
                     calculation_time,
                     json.dumps(weather_data)
                 )
-                return {"message": "Weather query saved successfully"}
+                return {"message": "Weather query saved successfully",
+                        "weather": [weather_data["name"],
+                    weather_data["weather"][0]['main'],
+                    weather_data["weather"][0]["description"],
+                    weather_data["main"]["temp"],
+                    weather_data["main"]["feels_like"],
+                    weather_data["main"]["humidity"],
+                    utils.hpa_to_mmhg(weather_data["main"]["pressure"]),
+                    weather_data["wind"]["speed"],
+                    utils.wind_direction(weather_data["wind"]["deg"]),
+                    sunrise_time,
+                    sunset_time,
+                    calculation_time]}
             except asyncpg.PostgresError as e:
                 raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
