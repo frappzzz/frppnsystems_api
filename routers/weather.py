@@ -13,6 +13,7 @@ async def weather_query(
     api_key: str = Depends(get_api_key),
     conn: asyncpg.Connection = Depends(get_db)
 ):
+    print(id_user,city)
     try:
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={os.getenv('WEATHER_API_KEY')}&units=metric"
         response = requests.get(url)
