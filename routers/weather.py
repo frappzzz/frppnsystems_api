@@ -14,20 +14,18 @@ async def weather_query(
     conn: asyncpg.Connection = Depends(get_db)
 ):
     print(id_user,city)
-    try:
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={os.getenv('WEATHER_API_KEY')}&units=metric"
-        response = requests.get(url)
-        if response.status_code == 200:
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={os.getenv('WEATHER_API_KEY')}&units=metric"
+    response = requests.get(url)
+    if response.status_code == 200:
             weather_data = response.json()
             print(weather_data)
             # Сохранение запроса в базу данных
             return weather_data
 
 
-        else:
-            raise HTTPException(status_code=500, detail=f"Weather not found")
-    except asyncpg.PostgresError as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    else:
+        raise HTTPException(status_code=500, detail=f"Weather not found")
+
 
 @router.get("/get_weather_history/{id_user}")
 async def get_weather_history(id_user: int, api_key: str = Depends(get_api_key), conn: asyncpg.Connection = Depends(get_db)):
