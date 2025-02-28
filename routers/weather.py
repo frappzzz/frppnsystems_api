@@ -6,7 +6,7 @@ import requests
 router = APIRouter()
 from utils import utils
 import json
-@router.post("/weather_query/")
+@router.get("/weather_query/")
 async def weather_query(
     id_user: int,
     city: str,
@@ -18,21 +18,9 @@ async def weather_query(
         response = requests.get(url)
         if response.status_code == 200:
             weather_data = response.json()
-
+            print(weather_data)
             # Сохранение запроса в базу данных
-            return {"weather":[weather_data["name"],
-                weather_data["weather"][0]['main'],
-                weather_data["weather"][0]["description"],
-                weather_data["main"]["temp"],
-                weather_data["main"]["feels_like"],
-                weather_data["main"]["humidity"],
-                utils.hpa_to_mmhg(weather_data["main"]["pressure"]),
-                weather_data["wind"]["speed"],
-                utils.wind_direction(weather_data["wind"]["deg"]),
-                utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"], weather_data["timezone"]),
-                utils.timestamp_to_hms_format(weather_data["sys"]["sunset"], weather_data["timezone"]),
-                utils.timestamp_to_hms_format(weather_data["dt"], weather_data["timezone"]),
-                json.dumps(weather_data)]}
+            return weather_data
 
 
         else:
