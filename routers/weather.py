@@ -6,6 +6,7 @@ import requests
 router = APIRouter()
 from utils import utils
 import json
+from datetime import datetime
 @router.get("/weather_query/")
 async def weather_query(
     id_user: int,
@@ -19,6 +20,15 @@ async def weather_query(
             weather_data = response.json()
             # Сохранение запроса в базу данных
             try:
+                sunrise_time_str = utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"],
+                                                                 weather_data["timezone"])
+                sunset_time_str = utils.timestamp_to_hms_format(weather_data["sys"]["sunset"], weather_data["timezone"])
+                calculation_time_str = utils.timestamp_to_hms_format(weather_data["dt"], weather_data["timezone"])
+
+                # Преобразуем строки в объекты `time`
+                sunrise_time = datetime.strptime(sunrise_time_str, '%H:%M:%S').time()
+                sunset_time = datetime.strptime(sunset_time_str, '%H:%M:%S').time()
+                calculation_time = datetime.strptime(calculation_time_str, '%H:%M:%S').time()
                 print(utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"], weather_data["timezone"]))
                 print(type(utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"], weather_data["timezone"])))
                 await conn.execute(
@@ -38,9 +48,9 @@ async def weather_query(
                     utils.hpa_to_mmhg(weather_data["main"]["pressure"]),
                     weather_data["wind"]["speed"],
                     utils.wind_direction(weather_data["wind"]["deg"]),
-                    utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"], weather_data["timezone"]),
-                    utils.timestamp_to_hms_format(weather_data["sys"]["sunset"], weather_data["timezone"]),
-                    utils.timestamp_to_hms_format(weather_data["dt"],weather_data["timezone"]),
+                    sunrise_time,
+                    sunset_time,
+                    calculation_time,
                     json.dumps(weather_data)
                 )
                 return {"message": "Weather query saved successfully"}
