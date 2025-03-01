@@ -17,7 +17,7 @@ async def get_notification_time_by_id_user(id_user: int,notification_type:str,ap
         if res:
             return JSONResponse(
                 status_code=200,
-                content=dict(res)
+                content=res
             )
         else:
             raise HTTPException(status_code=404, detail="User not found")
