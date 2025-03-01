@@ -66,7 +66,8 @@ async def weather_query(
                     utils.wind_direction(weather_data["wind"]["deg"]),
                     sunrise_time,
                     sunset_time,
-                    calculation_time]}
+                    calculation_time],
+                        "icon":weather_data["weather"][0]['icon']}
             except asyncpg.PostgresError as e:
                 raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
