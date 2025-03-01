@@ -11,13 +11,29 @@ import json
 from datetime import datetime
 
 @router.get("/get_notification_time/")
-async def get_notification_time_by_id_user(id_user: int,notification_type:str,api_key: str = Depends(get_api_key),conn: asyncpg.Connection = Depends(get_db)):
+async def get_notification_time_by_id_user(
+    id_user: int,
+    notification_type: str,
+    api_key: str = Depends(get_api_key),
+    conn: asyncpg.Connection = Depends(get_db)
+):
     try:
-        res=await conn.fetch("SELECT notification_time FROM notification_times WHERE id_user=$1 AND notification_type=$2",id_user,notification_type)
-        return JSONResponse(
+        # Выполняем запрос к базе данных
+        res = await conn.fetch(
+            "SELECT notification_time FROM notification_times WHERE id_user = $1 AND notification_type = $2",
+            id_user, notification_type
+        )
+
+        # Если результат есть, преобразуем его в список словарей
+        if res:
+            # Преобразуем asyncpg.Record в список словарей
+            notifications = [dict(record) for record in res]
+            return JSONResponse(
                 status_code=200,
-                content=res
+                content=notifications
             )
+        else:
+            raise HTTPException(status_code=404, detail="Notification times not found for the given user and type")
     except asyncpg.PostgresError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
