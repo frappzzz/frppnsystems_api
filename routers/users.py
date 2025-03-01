@@ -37,3 +37,24 @@ async def get_id_user_by_id_user_tg(id_user_tg: int,api_key: str = Depends(get_a
             raise HTTPException(status_code=404, detail="User not found")
     except asyncpg.PostgresError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
+
+@router.post("/set_user_name/")
+async def set_user_name(id_user: int,user_name:str,api_key: str = Depends(get_api_key),conn: asyncpg.Connection = Depends(get_db)):
+    try:
+        await conn.execute("UPDATE users SET name=$1 WHERE id_user=$2", user_name, id_user)
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Name updated successfully"}
+        )
+    except asyncpg.PostgresError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+@router.post("/set_user_home_city/")
+async def set_user_home_city(id_user: int,home_city:str,api_key: str = Depends(get_api_key),conn: asyncpg.Connection = Depends(get_db)):
+    try:
+        await conn.execute("UPDATE users SET home_city=$1 WHERE id_user=$2", home_city, id_user)
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Home city updated successfully"}
+        )
+    except asyncpg.PostgresError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
