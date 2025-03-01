@@ -27,7 +27,7 @@ async def check_auth_key(auth_key: str,api_key: str = Depends(get_api_key),conn:
         if res:
             return JSONResponse(
                 status_code=200,
-                content={"auth_key": dict(res)}
+                content=dict(res)
             )
         else:
             raise HTTPException(status_code=404, detail="Key not found")
@@ -43,7 +43,7 @@ async def auth_user(auth_key: str,id_user_tg: int,api_key: str = Depends(get_api
         if not res:
             raise HTTPException(status_code=404, detail="Key not found")
         await conn.execute("UPDATE auth_keys SET id_user_tg=$1 WHERE auth_key=$2", id_user_tg,auth_key)
-        await conn.execute("INSERT INTO users (id_user_tg, name_user) VALUES ($1,$2)",id_user_tg,"anonymous")
+        await conn.execute("INSERT INTO users (id_user_tg, name, home_city) VALUES ($1,$2)",id_user_tg,"anonymous","unknown")
         return JSONResponse(
             status_code=200,
             content={"message": "User authorized successfully"}
