@@ -24,10 +24,10 @@ async def get_notification_time_by_id_user(
             id_user, notification_type
         )
 
-        # Если результат есть, преобразуем его в список словарей
+        # Если результат есть, преобразуем его в список строк времени
         if res:
-            # Преобразуем asyncpg.Record в список словарей
-            notifications = [dict(record) for record in res]
+            # Преобразуем объект time в строку формата "HH:MM"
+            notifications = [record["notification_time"].strftime("%H:%M") for record in res]
             return JSONResponse(
                 status_code=200,
                 content=notifications
@@ -36,7 +36,6 @@ async def get_notification_time_by_id_user(
             raise HTTPException(status_code=404, detail="Notification times not found for the given user and type")
     except asyncpg.PostgresError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
-
 @router.post("/set_notification_time/")
 async def set_notification_time(
     id_user: int,
