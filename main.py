@@ -8,9 +8,12 @@ load_dotenv()
 app = FastAPI()
 
 # Подключаем роутеры
-from routers import weather
+from routers import weather, auth, users
 
 app.include_router(weather.router)
+app.include_router(auth.router)
+app.include_router(users.router)
+
 
 if __name__ == "__main__":
     import uvicorn

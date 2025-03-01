@@ -3,10 +3,11 @@ from dependencies.dependencies import get_db, get_api_key
 import asyncpg
 import os
 import requests
-router = APIRouter()
 from utils import utils
 import json
 from datetime import datetime
+
+router = APIRouter()
 @router.get("/weather_query/")
 async def weather_query(
     id_user: int,
