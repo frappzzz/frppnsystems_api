@@ -10,11 +10,12 @@ from utils import utils
 import json
 from datetime import datetime
 
+
 @router.get("/get_notifications_by_time/")
 async def get_notifications_by_time(
-    notification_time: str,  # Время в формате 'hh:mm'
-    api_key: str = Depends(get_api_key),
-    conn: asyncpg.Connection = Depends(get_db)
+        notification_time: str,  # Время в формате 'hh:mm'
+        api_key: str = Depends(get_api_key),
+        conn: asyncpg.Connection = Depends(get_db)
 ):
     try:
         # Преобразуем строку времени в объект времени
@@ -30,9 +31,13 @@ async def get_notifications_by_time(
             """,
             time_obj
         )
+
+        # Преобразуем записи в список словарей
+        notifications_list = [dict(record) for record in notifications]
+
         return JSONResponse(
             status_code=200,
-            content=[dict(record) for record in notifications]
+            content=notifications_list
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid time format: {e}")
