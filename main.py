@@ -8,11 +8,12 @@ load_dotenv()
 app = FastAPI()
 
 # Подключаем роутеры
-from routers import weather, auth, users
+from routers import weather, auth, users, notifications
 
 app.include_router(weather.router)
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(notifications.router)
 
 
 if __name__ == "__main__":
