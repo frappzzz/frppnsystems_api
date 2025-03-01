@@ -58,3 +58,16 @@ async def set_user_home_city(id_user: int,home_city:str,api_key: str = Depends(g
         )
     except asyncpg.PostgresError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
+@router.get("/get_user_by_id_user/{id_user}")
+async def get_user_by_id_user(id_user: int,api_key: str = Depends(get_api_key),conn: asyncpg.Connection = Depends(get_db)):
+    try:
+        res=await conn.fetchrow("SELECT * FROM users WHERE id_user=$1",id_user)
+        if res:
+            return JSONResponse(
+                status_code=200,
+                content=dict(res)
+            )
+        else:
+            raise HTTPException(status_code=404, detail="User not found")
+    except asyncpg.PostgresError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
