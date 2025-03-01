@@ -81,7 +81,7 @@ async def set_notification_time(
         raise HTTPException(status_code=400, detail=f"Invalid time format: {e}")
     except asyncpg.PostgresError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
-@router.get("/get_notifications_by_id_user")
+@router.get("/get_notifications_by_id_user/")
 async def get_notifications_by_id_user(id_user: str,  # Время в формате 'hh:mm'
         api_key: str = Depends(get_api_key),
         conn: asyncpg.Connection = Depends(get_db)
