@@ -10,30 +10,32 @@ from utils import utils
 import json
 from datetime import datetime
 
-@router.get("/get_notification_time/")
-async def get_notification_time_by_id_user(
-    id_user: int,
-    notification_type: str,
+@router.get("/get_notifications_by_time/")
+async def get_notifications_by_time(
+    notification_time: str,  # Время в формате 'hh:mm'
     api_key: str = Depends(get_api_key),
     conn: asyncpg.Connection = Depends(get_db)
 ):
     try:
-        # Выполняем запрос к базе данных
-        res = await conn.fetch(
-            "SELECT notification_time FROM notification_times WHERE id_user = $1 AND notification_type = $2",
-            id_user, notification_type
-        )
+        # Преобразуем строку времени в объект времени
+        time_obj = datetime.strptime(notification_time, '%H:%M').time()
 
-        # Если результат есть, преобразуем его в список строк времени
-        if res:
-            # Преобразуем объект time в строку формата "HH:MM"
-            notifications = [record["notification_time"].strftime("%H:%M") for record in res]
-            return JSONResponse(
-                status_code=200,
-                content=notifications
-            )
-        else:
-            raise HTTPException(status_code=404, detail="Notification times not found for the given user and type")
+        # Получаем список пользователей, у которых есть уведомления на это время
+        notifications = await conn.fetch(
+            """
+            SELECT nt.id_user, u.home_city 
+            FROM notification_times nt
+            JOIN users u ON nt.id_user = u.id_user
+            WHERE nt.notification_time = $1 AND nt.notification_type = 'weather'
+            """,
+            time_obj
+        )
+        return JSONResponse(
+            status_code=200,
+            content=[dict(record) for record in notifications]
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid time format: {e}")
     except asyncpg.PostgresError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 @router.post("/set_notification_time/")
