@@ -22,10 +22,28 @@ async def get_notification_time_by_id_user(id_user: int,notification_type:str,ap
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 @router.post("/set_notification_time/")
-async def set_notification_time(id_user: int,notification_type:str,notification_time:str,api_key: str = Depends(get_api_key),conn: asyncpg.Connection = Depends(get_db)):
+async def set_notification_time(
+    id_user: int,
+    notification_type: str,
+    notification_time: str,  # Время в формате 'hh:mm'
+    api_key: str = Depends(get_api_key),
+    conn: asyncpg.Connection = Depends(get_db)
+):
     try:
         # Преобразуем строку времени в объект времени
         time_obj = datetime.strptime(notification_time, '%H:%M').time()
+
+        # Проверяем, существует ли уже такая запись
+        existing_record = await conn.fetchrow(
+            "SELECT * FROM notification_times WHERE id_user = $1 AND notification_time = $2 AND notification_type = $3",
+            id_user, time_obj, notification_type
+        )
+
+        if existing_record:
+            raise HTTPException(
+                status_code=400,
+                detail="Notification time already exists for this user and type"
+            )
 
         # Вставляем новую запись в таблицу
         await conn.execute(
@@ -41,7 +59,6 @@ async def set_notification_time(id_user: int,notification_type:str,notification_
         raise HTTPException(status_code=400, detail=f"Invalid time format: {e}")
     except asyncpg.PostgresError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
-
 
 @router.delete("/delete_notification_time/")
 async def delete_notification_time(
