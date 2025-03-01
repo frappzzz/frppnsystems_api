@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from dependencies.dependencies import get_db, get_api_key
-from fastapi.responses import JSONResponse
 import asyncpg
 import os
 import requests
@@ -55,9 +54,8 @@ async def weather_query(
                     calculation_time,
                     json.dumps(weather_data)
                 )
-                return JSONResponse(
-                    status_code=200,
-                    content={"message": "Weather query saved successfully",
+
+                return {"message": "Weather query saved successfully",
                         "weather": [weather_data["name"],
                     weather_data["weather"][0]['main'],
                     weather_data["weather"][0]["description"],
@@ -71,7 +69,6 @@ async def weather_query(
                     sunset_time,
                     calculation_time],
                         "icon":weather_data["weather"][0]['icon']}
-                )
             except asyncpg.PostgresError as e:
                 raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
@@ -92,9 +89,6 @@ async def get_weather_history(id_user: int, api_key: str = Depends(get_api_key),
             """,
             id_user
         )
-        return JSONResponse(
-            status_code=200,
-            content=history
-        )
+        return history
     except asyncpg.PostgresError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
