@@ -24,7 +24,7 @@ async def get_notifications_by_time(
         # Получаем список пользователей, у которых есть уведомления на это время
         notifications = await conn.fetch(
             """
-            SELECT u.id_user_tg, u.home_city 
+            SELECT u.id_user_tg, u.id_user, u.home_city 
             FROM notification_times nt
             JOIN users u ON nt.id_user = u.id_user
             WHERE nt.notification_time = $1 AND nt.notification_type = 'weather'
