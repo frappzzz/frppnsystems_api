@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
-
 from dependencies.dependencies import get_db, get_api_key
 import asyncpg
 import os
