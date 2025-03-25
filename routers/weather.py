@@ -7,6 +7,7 @@ from utils import utils
 import json
 from datetime import datetime
 
+
 router = APIRouter()
 @router.get("/weather_query/")
 async def weather_query(

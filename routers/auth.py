@@ -11,6 +11,7 @@ import json
 from datetime import datetime
 
 
+
 @router.get("/generate_auth_key")
 async def generate_auth_key(api_key: str = Depends(get_api_key),conn: asyncpg.Connection = Depends(get_db)):
     auth_key=utils.generate_code()
