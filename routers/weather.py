@@ -24,7 +24,6 @@ async def weather_query(
                                                                  weather_data["timezone"])
                 sunset_time_str = utils.timestamp_to_hms_format(weather_data["sys"]["sunset"], weather_data["timezone"])
                 calculation_time_str = utils.timestamp_to_hms_format(weather_data["dt"], weather_data["timezone"])
-
                 # Преобразуем строки в объекты `time`
                 sunrise_time = datetime.strptime(sunrise_time_str, '%H:%M:%S').time()
                 sunset_time = datetime.strptime(sunset_time_str, '%H:%M:%S').time()
