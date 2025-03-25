@@ -30,8 +30,6 @@ async def weather_query(
                 sunrise_time = datetime.strptime(sunrise_time_str, '%H:%M:%S').time()
                 sunset_time = datetime.strptime(sunset_time_str, '%H:%M:%S').time()
                 calculation_time = datetime.strptime(calculation_time_str, '%H:%M:%S').time()
-                print(utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"], weather_data["timezone"]))
-                print(type(utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"], weather_data["timezone"])))
                 await conn.execute(
                     """
                     INSERT INTO weather_queries 
