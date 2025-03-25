@@ -19,7 +19,6 @@ async def weather_query(
     response = requests.get(url)
     if response.status_code == 200:
             weather_data = response.json()
-            # Сохранение запроса в базу данных
             try:
                 sunrise_time_str = utils.timestamp_to_hms_format(weather_data["sys"]["sunrise"],
                                                                  weather_data["timezone"])
