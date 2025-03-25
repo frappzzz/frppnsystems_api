@@ -9,7 +9,6 @@ router = APIRouter()
 from utils import utils
 import json
 from datetime import datetime
-
 @router.get("/check_id_user_tg/{id_user_tg}")
 async def check_id_user_tg(id_user_tg: int,api_key: str = Depends(get_api_key),conn: asyncpg.Connection = Depends(get_db)):
     print(id_user_tg)
