@@ -17,7 +17,7 @@ app.include_router(weather.router)
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(notifications.router)
-app.include_router(short_urls.router, prefix="/url", tags=["URL Shortener"])
+app.include_router(short_urls.router, tags=["URL Shortener"])
 
 if __name__ == "__main__":
     import uvicorn

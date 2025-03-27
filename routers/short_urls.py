@@ -70,7 +70,7 @@ async def create_short_url(
 
         return {
             **dict(record),
-            "short_url": f"https://185.43.4.64:5000/{short_code}"  # Замените на ваш домен
+            "short_url": f"http://185.43.4.64:5000/{short_code}"  # Замените на ваш домен
         }
 
     except asyncpg.PostgresError as e:
@@ -131,5 +131,5 @@ async def get_short_url_stats(
 
     return {
         **dict(record),
-        "short_url": f"https://185.43.4.64:5000/{short_code}"
+        "short_url": f"http://185.43.4.64:5000/{short_code}"
     }
