@@ -165,17 +165,43 @@
             }
         });
 
-        // Копирование ссылки
-        document.getElementById('copy-btn').addEventListener('click', () => {
+         document.getElementById('copy-btn').addEventListener('click', () => {
             const shortUrl = document.getElementById('short-url').textContent;
-            navigator.clipboard.writeText(shortUrl).then(() => {
-                const btn = document.getElementById('copy-btn');
-                btn.textContent = 'Скопировано!';
-                setTimeout(() => {
-                    btn.textContent = 'Копировать';
-                }, 2000);
-            });
+
+            // Проверяем поддержку Clipboard API
+            if (!navigator.clipboard) {
+                // Fallback для старых браузеров
+                const textArea = document.createElement('textarea');
+                textArea.value = shortUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showCopyFeedback();
+                } catch (err) {
+                    document.getElementById('error').textContent = 'Ошибка копирования: ' + err;
+                }
+                document.body.removeChild(textArea);
+                return;
+            }
+
+            // Современный способ
+            navigator.clipboard.writeText(shortUrl)
+                .then(() => {
+                    showCopyFeedback();
+                })
+                .catch(err => {
+                    document.getElementById('error').textContent = 'Ошибка копирования: ' + err;
+                });
         });
+
+        function showCopyFeedback() {
+            const btn = document.getElementById('copy-btn');
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => {
+                btn.textContent = 'Копировать';
+            }, 2000);
+        }
     </script>
 </body>
 </html>
