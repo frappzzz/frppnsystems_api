@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сократитель ссылок</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e0f7fa;
+            color: #01579b;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #0277bd;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #0288d1;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color: #0288d1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0277bd;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e1f5fe;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .short-url {
+            font-size: 18px;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            background-color: #4caf50;
+        }
+
+        .copy-btn:hover {
+            background-color: #388e3c;
+        }
+
+        .error {
+            color: #d32f2f;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Сократитель ссылок</h1>
+
+        <div class="form-group">
+            <label for="original_url">Введите длинную ссылку:</label>
+            <input type="url" id="original_url" placeholder="https://example.com/very/long/url" required>
+        </div>
+
+        <div class="form-group">
+            <label for="custom_code">Свой код (необязательно):</label>
+            <input type="text" id="custom_code" placeholder="abc123" maxlength="16">
+        </div>
+
+        <div class="form-group">
+            <label for="expires_days">Срок действия (дней, необязательно):</label>
+            <input type="text" id="expires_days" placeholder="30">
+        </div>
+
+        <button id="shorten-btn">Сократить ссылку</button>
+
+        <div id="error" class="error"></div>
+
+        <div id="result" class="result">
+            <h3>Ваша короткая ссылка:</h3>
+            <div id="short-url" class="short-url"></div>
+            <button id="copy-btn" class="copy-btn">Копировать</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('shorten-btn').addEventListener('click', async () => {
+            const originalUrl = document.getElementById('original_url').value;
+            const customCode = document.getElementById('custom_code').value;
+            const expiresDays = document.getElementById('expires_days').value;
+
+            // Очищаем предыдущие результаты
+            document.getElementById('error').textContent = '';
+            document.getElementById('result').style.display = 'none';
+
+            if (!originalUrl) {
+                document.getElementById('error').textContent = 'Пожалуйста, введите ссылку';
+                return;
+            }
+
+            try {
+                const response = await fetch('/url/shorten/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        original_url: originalUrl,
+                        custom_code: customCode || null,
+                        expires_days: expiresDays ? parseInt(expiresDays) : null
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Ошибка при сокращении ссылки');
+                }
+
+                const data = await response.json();
+
+                // Показываем результат
+                document.getElementById('short-url').textContent = data.short_url;
+                document.getElementById('result').style.display = 'block';
+
+            } catch (error) {
+                document.getElementById('error').textContent = error.message;
+            }
+        });
+
+        // Копирование ссылки
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const shortUrl = document.getElementById('short-url').textContent;
+            navigator.clipboard.writeText(shortUrl).then(() => {
+                const btn = document.getElementById('copy-btn');
+                btn.textContent = 'Скопировано!';
+                setTimeout(() => {
+                    btn.textContent = 'Копировать';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
