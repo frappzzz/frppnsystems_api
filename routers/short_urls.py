@@ -10,7 +10,7 @@ import asyncpg
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("/shortener", response_class=HTMLResponse)
 async def shortener_page(request: Request):
     """Отображает HTML страницу для сокращения ссылок"""
     return templates.TemplateResponse("shortener.html", {"request": request})
